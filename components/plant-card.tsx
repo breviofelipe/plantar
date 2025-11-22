@@ -183,7 +183,7 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
               <FileText className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-muted-foreground">Notas</p>
-                <p className="font-semibold text-foreground">{plant.notes}</p>
+                {/* <p className="font-semibold text-foreground">{plant.notes}</p> */}
               </div>
             </div>
           )}
