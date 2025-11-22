@@ -95,8 +95,8 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
+            <h3 className="text-2xl font-bold text-foreground">{plant.species}</h3>
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-2xl font-bold text-foreground">{plant.species}</h3>
               {isGerminating() && (
                 <span className="inline-flex items-center gap-1 bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-semibold">
                   <Sprout className="w-3 h-3" />
@@ -112,7 +112,7 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
                   }`}
                 >
                   <AlertCircle className="w-3 h-3" />
-                  {wateringStatus.status === "overdue" ? "Passada" : "Próxima"}
+                  {wateringStatus.status === "overdue" ? "Seca" : "Próxima"}
                 </span>
               )}
             </div>
