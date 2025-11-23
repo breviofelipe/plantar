@@ -6,6 +6,8 @@ import Link from "next/link"
 import PlantPhotoTimeline from "@/components/plant-photo-timeline"
 import NotesSection from "@/components/notes-section"
 
+import Chat from '@/components/Chat';
+
 export default function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [plant, setPlant] = useState(null)
@@ -181,6 +183,7 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
           />
         )}
       </div>
+      <Chat />
     </main>
   )
 }
