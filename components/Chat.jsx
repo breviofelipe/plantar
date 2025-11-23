@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function Chat() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('Dicas para cuidar de plantas em apartamento');
   const [conversation, setConversation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
