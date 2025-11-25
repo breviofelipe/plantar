@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ChangeEvent } from "react"
 import { Plus, Trash2, Calendar } from "lucide-react"
+import { compressImage } from "@/lib/image-compression"
 
 interface Photo {
   _id: string
@@ -28,8 +29,14 @@ export default function PlantPhotoTimeline({ photos, onAddPhoto, onDeletePhoto }
     const reader = new FileReader()
     reader.onload = (event) => {
       const base64 = event.target?.result as string
-      setSelectedFile(base64)
+      
       setPreview(base64)
+      compressImage(base64, 192, 0.7).then((compress) => {
+        console.log("compressedPhoto sucesso")
+        setSelectedFile(compress)
+      }).catch((error) => {
+        console.error("Image compression error:", error)
+      })
     }
     reader.readAsDataURL(file)
   }

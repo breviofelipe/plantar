@@ -11,6 +11,7 @@ async function getDatabase() {
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    console.log("salvando nova foto da planta")
     const supabase = await createServerSupabaseClient()
     const {
       data: { user },
@@ -32,11 +33,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     let compressedPhoto = body.photo
     if (body.photo) {
-      try {
-        compressedPhoto = await compressImage(body.photo, 1200, 0.8)
-      } catch (error) {
-        console.error("Image compression error:", error)
-      }
+      // try {
+      //   compressedPhoto = await compressImage(body.photo, 720, 0.6)
+      //   console.log("compressedPhoto sucesso")
+      // } catch (error) {
+      //   console.error("Image compression error:", error)
+      // }
     }
 
     const newPhoto = {
