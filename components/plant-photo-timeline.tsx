@@ -31,7 +31,7 @@ export default function PlantPhotoTimeline({ photos, onAddPhoto, onDeletePhoto }
       const base64 = event.target?.result as string
       
       setPreview(base64)
-      compressImage(base64, 192, 0.7).then((compress) => {
+      compressImage(base64, 384, 0.7).then((compress) => {
         console.log("compressedPhoto sucesso")
         setSelectedFile(compress)
       }).catch((error) => {
@@ -127,13 +127,13 @@ export default function PlantPhotoTimeline({ photos, onAddPhoto, onDeletePhoto }
                 className="bg-card rounded-xl overflow-hidden border border-border hover:border-primary transition-colors"
               >
                 <div className="flex flex-col md:flex-row gap-4">
-                  <div className="md:w-48 h-48 bg-muted flex-shrink-0">
+                    <div className="md:w-48 h-48 bg-muted flex-shrink-0 flex items-center justify-center overflow-hidden">
                     <img
                       src={photo.photo || "/placeholder.svg"}
                       alt={`Foto ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
-                  </div>
+                    </div>
                   <div className="flex-1 p-4 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
