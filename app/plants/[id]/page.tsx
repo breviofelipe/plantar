@@ -7,6 +7,7 @@ import PlantPhotoTimeline from "@/components/plant-photo-timeline"
 import NotesSection from "@/components/notes-section"
 
 import Chat from '@/components/Chat';
+import Tips from "@/components/Tips"
 
 export default function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -144,7 +145,7 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
-
+        <Tips plant={plant} handleAddNote={handleAddNote} />
         {/* Tabs */}
         <div className="flex gap-2 mb-8 border-b border-border">
           <button
@@ -183,7 +184,9 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
           />
         )}
       </div>
-      <Chat />
+      
+      {/* <Chat /> */}
+
     </main>
   )
 }
