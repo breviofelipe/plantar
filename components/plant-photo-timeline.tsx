@@ -25,18 +25,18 @@ export default function PlantPhotoTimeline({ photos, onAddPhoto, onDeletePhoto }
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0]
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = (event) => {
       const base64 = event.target?.result as string
       
       setPreview(base64)
-      compressImage(base64, 384, 0.7).then((compress) => {
-        console.log("compressedPhoto sucesso")
-        setSelectedFile(compress)
-      }).catch((error) => {
-        console.error("Image compression error:", error)
-      })
+      setSelectedFile(base64)
+      // compressImage(base64, 384, 0.7).then((compress) => {
+      //   console.log("compressedPhoto sucesso")
+      //   setSelectedFile(compress)
+      // }).catch((error) => {
+      //   console.error("Image compression error:", error)
+      // })
     }
     reader.readAsDataURL(file)
   }

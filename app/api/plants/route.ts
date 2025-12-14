@@ -2,6 +2,7 @@ import { connectToDatabase } from "@/lib/mongodb"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
 import { compressImage } from "@/lib/image-compression"
+import { uploadImage } from "@/lib/cloudinary-client"
 
 interface PlantInput {
   species: string
@@ -49,15 +50,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body: PlantInput = await request.json()
     const client = await connectToDatabase()
     const db = client.db("planttracker")
-
     let compressedPhoto = body.photo || null
-    if (body.photo) {
-      try {
-        compressedPhoto = await compressImage(body.photo, 1200, 0.8)
-      } catch (error) {
-        console.error("Image compression error:", error)
-      }
-    }
+    if(body.photo)
+      compressedPhoto = await uploadImage(body.photo)
 
     const newPlant = {
       userId: user.id, // Add userId to plant

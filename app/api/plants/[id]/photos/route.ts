@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { ObjectId } from "mongodb"
 import { type NextRequest, NextResponse } from "next/server"
 import { compressImage } from "@/lib/image-compression"
+import { uploadImage } from "@/lib/cloudinary-client"
 
 async function getDatabase() {
   const client = await connectToDatabase()
@@ -32,18 +33,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     let compressedPhoto = body.photo
-    if (body.photo) {
-      // try {
-      //   compressedPhoto = await compressImage(body.photo, 720, 0.6)
-      //   console.log("compressedPhoto sucesso")
-      // } catch (error) {
-      //   console.error("Image compression error:", error)
-      // }
-    }
 
+    const url = await uploadImage(compressedPhoto)
     const newPhoto = {
       _id: new ObjectId(),
-      photo: compressedPhoto,
+      photo: url,
       caption: body.caption || "",
       createdAt: new Date(),
     }
