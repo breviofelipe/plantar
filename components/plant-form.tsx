@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ChangeEvent } from "react"
 import { X, Upload } from "lucide-react"
+import PlantInfos from "./plant-infos"
 
 interface FormData {
   species: string
@@ -98,6 +99,7 @@ export default function PlantForm({ onSubmit, onCancel }: PlantFormProps) {
             required
           />
         </div>
+        <PlantInfos query={formData.species} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
