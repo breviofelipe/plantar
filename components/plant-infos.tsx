@@ -47,7 +47,7 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ specie: query, response: data.message }),
+                body: JSON.stringify({ specie: query, response: data.response }),
             }).then(() => { console.log('Plant info saved to database'); });
             setResponse(data.response);
         } catch (err) {
