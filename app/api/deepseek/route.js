@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request) {
   try {
     const { message } = await request.json();
+    console.log("Received message to DeepSeek:", message.slice(0, 10)); // Log first 100 characters
     
     if (!message) {
       return NextResponse.json(

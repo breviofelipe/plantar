@@ -18,43 +18,63 @@ Formato JSON obrigatório (responda APENAS com este JSON):
   "luz": "string",
   "agua": "string",
   "solo": "string",
+  "substrato_ideal": "string",
   "temperatura_ideal": "string",
-  "dicas_cuidados": ["string"].
+  "dicas_cuidados": ["string"],
   "despertar_semente": "string"
 }
 
 Responda em português. Nenhum texto antes ou depois do JSON.`;
+
     const fetchPlantInfo = async () => {
         setLoading(true);
         setError(null);
         
-        try {
-            const res = await fetch('/api/deepseek', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message }),
-            });
+        fetch(`/api/plants/info?specie=${encodeURIComponent(query)}`)
+            .then(async (res) => {
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log("Database response:", data);
+                    if (data.info) {
+                        console.log('Plant info found in database:', data);
+                        setResponse(data.info);
+                        setLoading(false);
+                        return;
+                    }
+                } else {
+                    console.log("Plant not found in database, fetching from deepseek.");
+                    try {
+                        const res = await fetch('/api/deepseek', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ message }),
+                        });
+    
+                        if (!res.ok) {
+                            throw new Error('Failed to fetch plant information');
+                        }
+    
+                        const data = await res.json() as { response: string };
+                        let response = data.response.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
+                        console.log("response from deepseek:", response);
+                        fetch('/api/plants/info', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ specie: query, response }),
+                        }).then(() => { console.log('Plant info saved to database'); });
+                        setResponse(response);
+                    } catch (err) {
+                        setError(err instanceof Error ? err.message : 'Unknown error');
+                    } finally {
+                        setLoading(false);
+                    }
+                }        
 
-            if (!res.ok) {
-                throw new Error('Failed to fetch plant information');
-            }
-
-            const data = await res.json();
-            fetch('/api/plants/info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ specie: query, response: data.response }),
-            }).then(() => { console.log('Plant info saved to database'); });
-            setResponse(data.response);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
-        } finally {
-            setLoading(false);
-        }
+        });
     };
 
     return (
@@ -68,7 +88,7 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
             </button>
 
             {error && <p className="text-red-600 mt-2">{error}</p>}
-            {response && (
+            {!loading && response && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     {(() => {
                         try {
@@ -87,16 +107,22 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
                                             <h3 className="font-semibold text-cyan-600">Água</h3>
                                             <p className="text-sm text-gray-700 mt-1">{data.agua}</p>
                                         </div>
-                                        
+
                                         <div className="bg-white p-3 rounded border-l-4 border-amber-500">
                                             <h3 className="font-semibold text-amber-600">Solo</h3>
                                             <p className="text-sm text-gray-700 mt-1">{data.solo}</p>
                                         </div>
                                         
+
                                         <div className="bg-white p-3 rounded border-l-4 border-red-500">
                                             <h3 className="font-semibold text-red-600">Temperatura Ideal</h3>
                                             <p className="text-sm text-gray-700 mt-1">{data.temperatura_ideal}</p>
                                         </div>
+                                    </div>
+                                                                            
+                                    <div className="bg-white p-3 rounded border-l-4 border-amber-700">
+                                        <h3 className="font-semibold text-amber-800">Substrato</h3>
+                                        <p className="text-sm text-gray-700 mt-1">{data.substrato_ideal}</p>
                                     </div>
                                     <div className="bg-white p-3 rounded border-l-4 border-purple-500">
                                         <h3 className="font-semibold text-purple-600">Despertar da Semente</h3>

@@ -8,7 +8,7 @@ async function getDatabase() {
   return client.db("planttracker")
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ specie: string }> }) {
   try {
     const supabase = await createServerSupabaseClient()
     const {
@@ -19,15 +19,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { id } = await params
+    const { specie } = await request.nextUrl.searchParams.get('specie') ? { specie: request.nextUrl.searchParams.get('specie')! } : { specie: 'ERROR' };
     const db = await getDatabase()
 
     const plant = await db.collection("all_plants").findOne({
-      _id: new ObjectId(id),
-      userId: user.id,
-    })
+      species: specie
+    });
 
     if (!plant) {
+      console.log("Planta não encontrada no banco de dados:", specie)
       return NextResponse.json({ error: "Planta não encontrada" }, { status: 404 })
     }
 
