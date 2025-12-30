@@ -83,6 +83,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { specie, response } = body
     const db = await getDatabase()
 
+    const existingPlant = await db.collection("all_plants").findOne({
+      species: specie,
+    })
+
+    if (existingPlant) {
+      console.log("Planta já existe no banco de dados, atualizando informação:", specie)
+      return NextResponse.json({ success: true })
+    }
     const result = await db.collection("all_plants").insertOne(
       { species: specie, info: response, userId: user.id },
     )

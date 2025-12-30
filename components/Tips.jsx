@@ -1,9 +1,9 @@
 'use client';
 
-import { Clock } from 'lucide-react';
+import { Clock, RefreshCcw, RefreshCcwDotIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function Tips({ plant, handleAddNote }) {
+export default function Tips({ plant, handleAddNote, isAuto = true }) {
   const [conversation, setConversation] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const calculateDaysSincePlanted = (date) => {
@@ -15,6 +15,24 @@ export default function Tips({ plant, handleAddNote }) {
   const daysSincePlanted = calculateDaysSincePlanted(plant.plantedDate)
   const [message, setMessage] = useState(`Dica do dia para cuidar de ${plant.species} há ${daysSincePlanted} dias desde a semeadura. Apenas uma dica sucinta e prática.`);
   
+
+  const fetchDailyNote = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      console.log('Buscando nota para a id:', plant._id);
+      const response = await fetch(`/api/plants/${plant._id}/notes?date=${today}`);
+      if(response.ok){
+        const data = await response.json();
+        if (data) {
+          console.log('Nota diária encontrada:', data);
+          setConversation(data);
+        } 
+      } else sendMessage();
+    } catch (error) {
+      console.error('Erro ao buscar nota:', error);
+    }
+  };
+
   const sendMessage = async () => {
     if (!message.trim()) return;
 
@@ -44,7 +62,8 @@ export default function Tips({ plant, handleAddNote }) {
   };
 
   useEffect(() => {
-    sendMessage();
+    if(isAuto) fetchDailyNote();
+    // sendMessage();
   }, [plant]);
 
   const formatDate = (dateString) => {
@@ -57,6 +76,26 @@ export default function Tips({ plant, handleAddNote }) {
       minute: "2-digit",
     })
   }
+
+  if (!isAuto) {
+    return (
+      <div className="flex justify-center">
+      <button
+      onClick={sendMessage}
+      disabled={isLoading}
+      className="p-2 hover:bg-blue-500/10 text-blue-500 rounded-lg transition-colors"
+      >
+      {isLoading ?  
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Clock className="h-4 w-4 animate-spin" />
+                  <span>Gerando nova dica...</span>
+                </div> :
+                <RefreshCcw className="w-5 h-5" />}
+      </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
         <div className="bg-card rounded-xl p-6 border border-border">

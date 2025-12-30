@@ -8,6 +8,7 @@ import NotesSection from "@/components/notes-section"
 
 import Chat from '@/components/Chat';
 import Tips from "@/components/Tips"
+import PlantInfos from "@/components/plant-infos"
 
 export default function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -120,7 +121,8 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
           </Link>
 
           <div className="bg-card rounded-xl p-8 border border-border">
-            <h1 className="text-4xl font-bold text-foreground mb-2">{plant.species}</h1>
+            {/* <h1 className="text-4xl font-bold text-foreground mb-2">{plant.species}</h1> */}
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Data de Semeadura</p>
@@ -143,6 +145,7 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
                 </p>
               </div>
             </div>
+            <PlantInfos query={plant.species} isAuto={true} />
           </div>
         </div>
         <Tips plant={plant} handleAddNote={handleAddNote} />

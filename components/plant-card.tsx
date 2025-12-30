@@ -3,6 +3,9 @@
 import { Droplet, Trash2, Calendar, FileText, Sprout, ChevronRight, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import type { ObjectId } from "mongodb"
+import Tips from "./Tips"
+import { useState } from "react"
+import Typewriter from "./Typewriter"
 
 interface Plant {
   _id: ObjectId | string
@@ -13,7 +16,7 @@ interface Plant {
   maxGermination: number
   wateringFrequency: number
   photo?: string | null
-  notes?: string
+  notes?: any[] | null
 }
 
 interface WateringStatus {
@@ -71,6 +74,25 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
   const daysSinceWatered = plant.lastWateredDate ? calculateDaysSinceWatered(plant.lastWateredDate) : null
   const wateringStatus = getWateringStatus()
 
+  const [llmResponse, setLlmResponse] = useState<string>("")
+  const [showLlmChat, setShowLlmChat] = useState<boolean>(false)
+
+  const handleAddNote = (note: any) => {
+    setLlmResponse(note)
+    handleShowLlmChat()
+  }
+
+  const handleShowLlmChat = () => {
+    setShowLlmChat(!showLlmChat)
+  }
+
+  const LlmNote = () => {
+    return <div className="mt-4 p-4 bg-accent/10 border border-accent rounded-lg">
+      
+      
+    </div>
+  }
+
   const formatDate = (dateString: string | Date): string => {
     return new Date(dateString).toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -80,7 +102,8 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
   }
 
   return (
-    <Link href={`/plants/${plant._id}`}>
+    // 
+    <div>
       <div className="bg-card border-2 border-accent rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:border-primary overflow-hidden cursor-pointer group relative">
         {plant.photo && (
           <div className="mb-4 -mx-6 -mt-6">
@@ -94,7 +117,7 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
 
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
+          <Link href={`/plants/${plant._id}`} className="flex-1">
             <h3 className="text-2xl font-bold text-foreground">{plant.species}</h3>
             <div className="flex items-center gap-2 mb-1">
               {isGerminating() && (
@@ -122,7 +145,7 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
                 plant.maxGermination &&
                 `(Germinação: ${plant.minGermination}-${plant.maxGermination} dias)`}
             </p>
-          </div>
+          </Link>
           <button
             onClick={(e) => {
               e.preventDefault()
@@ -179,11 +202,23 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
           </div>
 
           {plant.notes && (
-            <div className="flex items-start gap-3 text-sm">
+            <div className="flex items-start justify-between gap-3 text-sm">
               <FileText className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-muted-foreground">Notas</p>
-                {/* <p className="font-semibold text-foreground">{plant.notes}</p> */}
+                <div className="flex items-start justify-between">
+                <p className="text-muted-foreground">Última Dica</p>
+                <Tips isAuto={false} plant={plant} handleAddNote={(note: any) => {
+                      handleAddNote(note);
+                      fetch(`/api/plants/${plant._id}/notes`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ content: note }),
+                      }).then(() => { console.log('Dica adicionada com sucesso');})
+                }} />
+                  
+                </div>
+                {!showLlmChat && plant.notes.length > 0 && <p className="font-semibold text-foreground">{plant.notes[plant.notes.length  - 1].content}</p>}
+                {showLlmChat && <Typewriter text={llmResponse} />}
               </div>
             </div>
           )}
@@ -205,6 +240,6 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
           <ChevronRight className="w-5 h-5 text-primary" />
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

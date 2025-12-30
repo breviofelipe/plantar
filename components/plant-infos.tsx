@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface PlantInfosProps {
     query: string;
+    isAuto?: boolean;
 }
 
-export default function PlantInfos({ query }: PlantInfosProps) {
+export default function PlantInfos({ query, isAuto = false }: PlantInfosProps) {
     const [response, setResponse] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -77,16 +79,27 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
         });
     };
 
+    useEffect(() => {
+        if (isAuto) {
+        fetchPlantInfo();
+        }
+    }, [isAuto]);
+
     return (
         <div className="p-4">
-            <button
+            {!isAuto && <button
                 onClick={fetchPlantInfo}
                 disabled={loading}
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
-                {loading ? 'Loading...' : `Obter informações sobre ${query}`}
-            </button>
-
+                {`Obter informações sobre ${query}`}
+            </button>}
+            {loading && (
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                            <Clock className="h-4 w-4 animate-spin" />
+                            <span>{`Obtendo informações sobre ${query}...`}</span>
+                            </div>
+                        )}
             {error && <p className="text-red-600 mt-2">{error}</p>}
             {!loading && response && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
