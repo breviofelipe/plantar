@@ -6,15 +6,18 @@ import Link from "next/link"
 import PlantPhotoTimeline from "@/components/plant-photo-timeline"
 import NotesSection from "@/components/notes-section"
 
-import Chat from '@/components/Chat';
 import Tips from "@/components/Tips"
 import PlantInfos from "@/components/plant-infos"
+import FertilizerModalTemplate from "@/components/fertilizer-modal-template"
+
 
 export default function PlantDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [plant, setPlant] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("notes")
+  const [showFertilizerModal, setShowFertilizerModal] = useState(false)
+  const [fertilizerData, setFertilizerData] = useState(null)
 
   useEffect(() => {
     fetchPlantDetails()
@@ -110,6 +113,40 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
     )
   }
 
+  function gerarReceitaAdubo(plant: any) {
+    fetch('/api/generate-fertilizer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ species: plant.species }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(`Receita de adubo para ${plant.species}:\n\n${data.frequency}`);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
+
+
+  const handleGenerateFertilizer = async () => {
+    try {
+      const res = await fetch('/api/generate-fertilizer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ species: plant.species }),
+      })
+      const data = await res.json()
+      setFertilizerData(JSON.parse(data))
+      setShowFertilizerModal(true)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -119,7 +156,8 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
             <ArrowLeft className="w-5 h-5" />
             Voltar para minhas plantas
           </Link>
-
+          <PlantInfos query={plant.species} isAuto={true} />
+          {showFertilizerModal && <FertilizerModalTemplate data={fertilizerData} />}
           <div className="bg-card rounded-xl p-8 border border-border">
             {/* <h1 className="text-4xl font-bold text-foreground mb-2">{plant.species}</h1> */}
             
@@ -144,8 +182,14 @@ export default function PlantDetailPage({ params }: { params: Promise<{ id: stri
                   {plant.minGermination} - {plant.maxGermination} dias
                 </p>
               </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Adubo</p>
+                <button onClick={handleGenerateFertilizer} className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors">
+                  Criar adubo 
+                </button>
+              </div>
             </div>
-            <PlantInfos query={plant.species} isAuto={true} />
+            
           </div>
         </div>
         <Tips plant={plant} handleAddNote={handleAddNote} />

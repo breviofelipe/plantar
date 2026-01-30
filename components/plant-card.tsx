@@ -86,13 +86,6 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
     setShowLlmChat(!showLlmChat)
   }
 
-  const LlmNote = () => {
-    return <div className="mt-4 p-4 bg-accent/10 border border-accent rounded-lg">
-      
-      
-    </div>
-  }
-
   const formatDate = (dateString: string | Date): string => {
     return new Date(dateString).toLocaleDateString("pt-BR", {
       day: "2-digit",
