@@ -25,6 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const plant = await db.collection("plants").findOne({
       _id: new ObjectId(id),
       userId: user.id,
+      arquivado: { $ne: true },
     })
 
     if (!plant) {
@@ -52,12 +53,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { id } = await params
     const db = await getDatabase()
 
-    const result = await db.collection("plants").deleteOne({
-      _id: new ObjectId(id),
-      userId: user.id,
-    })
+    const result = await db.collection("plants").updateOne(
+      { _id: new ObjectId(id), userId: user.id },
+      { $set: { arquivado: true, updatedAt: new Date() } }
+    )
 
-    if (result.deletedCount === 0) {
+    if (result.matchedCount === 0) {
       return NextResponse.json({ error: "Planta não encontrada" }, { status: 404 })
     }
 

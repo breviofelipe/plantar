@@ -21,7 +21,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { specie } = await request.nextUrl.searchParams.get('specie') ? { specie: request.nextUrl.searchParams.get('specie')! } : { specie: 'ERROR' };
     const db = await getDatabase()
-
     const plant = await db.collection("all_plants").findOne({
       species: specie
     });
@@ -83,6 +82,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { specie, response } = body
     const db = await getDatabase()
 
+    
     const existingPlant = await db.collection("all_plants").findOne({
       species: specie,
     })

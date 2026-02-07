@@ -61,6 +61,7 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
                         const data = await res.json() as { response: string };
                         let response = data.response.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '');
                         console.log("response from deepseek:", response);
+                        response = JSON.parse(response);
                         fetch('/api/plants/info', {
                             method: 'POST',
                             headers: {
@@ -105,7 +106,7 @@ Responda em português. Nenhum texto antes ou depois do JSON.`;
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     {(() => {
                         try {
-                            const data = JSON.parse(response);
+                            const data = response;
                             return (
                                 <div className="space-y-4">
                                     <h2 className="text-2xl font-bold text-green-700">{query} ({data.nome_cientifico})</h2>

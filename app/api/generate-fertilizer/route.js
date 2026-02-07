@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { sendMessageToDeepSeek } from '../../../lib/deepseek';
+import { connectToDatabase } from "@/lib/mongodb"
+
+async function getDatabase() {
+  const client = await connectToDatabase()
+  return client.db("planttracker")
+}
 
 export async function POST(request) {
     try {
@@ -12,6 +18,15 @@ export async function POST(request) {
                 { status: 400 }
             );
         }
+
+        const db = await getDatabase();
+        const plant = await db.collection('all_plants').findOne({ species });
+
+        if (plant) {
+            console.log('Found existing fertilizer data for species:', species);
+            if(plant.fertilizerData)
+                return NextResponse.json(plant.fertilizerData, { status: 200 });
+        } 
 
         // Generate fertilizer recommendations based on species
         const message = `Gere recomendações de fertilizantes para a planta ${species} em formato JSON com os seguintes campos: species, recommendations (array com type, percentage e description), frequency e bestSeason. Responda apenas com o JSON válido.`;
@@ -41,14 +56,27 @@ export async function POST(request) {
         let json = JSON.stringify(fertilizerData);
         try{
             const response = await sendMessageToDeepSeek(message);
-             json = response.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '')
-            console.log('Fertilizer generation response:', json);
+            json = response.replace(/^\s*```json\s*/, '').replace(/\s*```\s*$/, '')
+            const parsedData = JSON.parse(json);
+            
+            // Save to database
+            await db.collection('all_plants').updateOne(
+                { species },
+                { $set: { fertilizerData: parsedData } },
+                { upsert: true }
+            );
+            console.log('Saved fertilizer data for species:', species);
+            return NextResponse.json(parsedData, { status: 200 });
         } catch (error) {
             console.error('Error communicating with DeepSeek:', error);
+            return NextResponse.json(
+                { error: 'Failed to generate fertilizer data' },
+                { status: 500 }
+            );
         }
-
-        return NextResponse.json(json, { status: 200 });
     } catch (error) {
+
+        console.error('Error generating fertilizer data:', error);
         return NextResponse.json(
             { error: 'Failed to generate fertilizer data' },
             { status: 500 }

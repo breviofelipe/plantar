@@ -1,5 +1,40 @@
-export default function FertilizerModalTemplate({ data }) {
-  console.log('Rendering FertilizerModalTemplate with data:', data);
+import { useState } from "react";
+
+export default function FertilizerModalTemplate({ specie }) {
+  
+
+  const [open, setOpen] = useState(false);
+  const [fertilizerData, setFertilizerData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleGenerateFertilizer = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/generate-fertilizer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ species: specie }),
+      })
+      const data = await res.json()
+      setFertilizerData(data)
+      setOpen(true)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error:', error)
+      setLoading(false)
+    }
+  }
+
+  if(!open) {
+    return (
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Adubo</p>
+                <button disabled={loading} onClick={handleGenerateFertilizer} className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors">
+                   {loading ? 'Criando adubo...' : 'Criar adubo'}
+                </button>
+              </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
@@ -9,13 +44,13 @@ export default function FertilizerModalTemplate({ data }) {
             Fertilizer Recommendation
           </h2>
           <h1 className="text-2xl font-bold text-gray-800">
-            🌻 {data.species}
+            🌻 {fertilizerData?.species}
           </h1>
         </div>
 
         {/* Nutrients */}
         <div className="space-y-4">
-          {data.recommendations && data.recommendations.map((item) => (
+          {fertilizerData?.recommendations && fertilizerData.recommendations.map((item) => (
             <div key={item.type}>
               <div className="flex justify-between text-sm font-medium text-gray-700">
                 <span>{item.type}</span>
@@ -43,7 +78,7 @@ export default function FertilizerModalTemplate({ data }) {
                 Frequência de Aplicação
               </p>
               <p className="text-sm text-gray-700">
-                {data.frequency}
+                {fertilizerData?.frequency}
               </p>
             </div>
 
@@ -52,14 +87,14 @@ export default function FertilizerModalTemplate({ data }) {
                 Melhor Estação
               </p>
               <p className="text-sm text-gray-700">
-                {data.bestSeason}
+                {fertilizerData?.bestSeason}
               </p>
             </div>
           </div>
 
           {/* Rodapé */}
         <div className="mt-6 flex justify-end">
-          <button className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
+          <button onClick={() => setOpen(false)} className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700">
             Fechar 🌱
           </button>
         </div>

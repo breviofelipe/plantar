@@ -1,7 +1,6 @@
 import { connectToDatabase } from "@/lib/mongodb"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
-import { compressImage } from "@/lib/image-compression"
 import { uploadImage } from "@/lib/cloudinary-client"
 
 interface PlantInput {
@@ -61,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       lastWateredDate: body.lastWateredDate ? new Date(body.lastWateredDate) : null,
       minGermination: Number.parseInt(body.minGermination),
       maxGermination: Number.parseInt(body.maxGermination),
-      wateringFrequency: Number.parseInt(body.wateringFrequency) || 7,
+      wateringFrequency: Number.parseInt(body.wateringFrequency || "7"),
       photo: compressedPhoto,
       notes: [],
       photos: [],
