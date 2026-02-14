@@ -33,6 +33,7 @@ export default function Home() {
   const [plants, setPlants] = useState<Plant[]>([])
   const [showForm, setShowForm] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
+  
 
   useEffect(() => {
     fetchPlants()
@@ -68,18 +69,7 @@ export default function Home() {
     }
   }
 
-  const handleDeletePlant = async (id: string): Promise<void> => {
-    try {
-      const res = await fetch(`/api/plants/${id}`, {
-        method: "DELETE",
-      })
-      if (res.ok) {
-        await fetchPlants()
-      }
-    } catch (error) {
-      console.error("Erro ao deletar planta:", error)
-    }
-  }
+  
 
   const handleWaterPlant = async (id: string): Promise<void> => {
     try {
@@ -146,7 +136,7 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plants.map((plant) => (
-              <PlantCard key={plant._id} plant={plant} onDelete={handleDeletePlant} onWater={handleWaterPlant} />
+              <PlantCard key={plant._id} plant={plant} fetchPlants={fetchPlants} onWater={handleWaterPlant} />
             ))}
           </div>
         )}

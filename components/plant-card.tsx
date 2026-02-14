@@ -28,11 +28,29 @@ interface WateringStatus {
 
 interface PlantCardProps {
   plant: Plant
-  onDelete: (id: string | ObjectId) => void
+  fetchPlants: () => void
   onWater: (id: string | ObjectId) => void
 }
 
-export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) {
+export default function PlantCard({ plant, fetchPlants, onWater }: PlantCardProps) {
+
+  const [loadingDelete, setLoadingDelete] = useState<boolean>(false)
+  
+  const handleDeletePlant = async (id: string): Promise<void> => {
+    setLoadingDelete(true)
+    try {
+      const res = await fetch(`/api/plants/${id}`, {
+        method: "DELETE",
+      })
+      if (res.ok) {
+        await fetchPlants()
+      }
+    } catch (error) {
+      console.error("Erro ao deletar planta:", error)
+    } finally{
+      setLoadingDelete(false)
+    }
+  }
   const calculateDaysSincePlanted = (date: string | Date): number => {
     const planted = new Date(date)
     const today = new Date()
@@ -142,11 +160,11 @@ export default function PlantCard({ plant, onDelete, onWater }: PlantCardProps) 
           <button
             onClick={(e) => {
               e.preventDefault()
-              onDelete(plant._id)
+              handleDeletePlant(plant._id as string)
             }}
             className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
           >
-            <Trash2 className="w-5 h-5" />
+            { !loadingDelete ? <Trash2 className="w-5 h-5" /> : "Removendo..." }
           </button>
         </div>
 

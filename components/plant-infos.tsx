@@ -17,7 +17,7 @@ Forneça informações detalhadas sobre: ${query}
 Formato JSON obrigatório (responda APENAS com este JSON):
 {
   "nome_cientifico": "string",
-  "luz": "string",
+  "luz": "string (Informe lampada ideal para indoor ou horas de sol)",
   "agua": "string",
   "solo": "string",
   "substrato_ideal": "string",

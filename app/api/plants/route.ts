@@ -27,7 +27,7 @@ export async function GET(): Promise<NextResponse> {
 
     const client = await connectToDatabase()
     const db = client.db("planttracker")
-    const plants = await db.collection("plants").find({ userId: user.id }).toArray()
+    const plants = await db.collection("plants").find({ userId: user.id, arquivado: { $ne: true } }).toArray()
     return NextResponse.json(plants)
   } catch (error) {
     console.error("Database error:", error)

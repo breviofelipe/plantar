@@ -24,8 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const plant = await db.collection("plants").findOne({
       _id: new ObjectId(id),
-      userId: user.id,
-      arquivado: { $ne: true },
+      userId: user.id
     })
 
     if (!plant) {
